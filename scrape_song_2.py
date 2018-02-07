@@ -26,7 +26,8 @@ def main():
         root_url = URL_ARTIST_DEFAULT
 
     client = MongoClient('localhost', 27017) # 第2引数はポート番号
-    collection = client.scraping.songs # scraping データベースの songs コレクションを得る（ない場合は新規作成）
+    # scraping データベースの songs コレクションを得る(ない場合は新規作成)
+    collection = client.scraping.songs 
     collection.create_index('key', unique=True)
 
     session = requests.Session()  # Session によって複数ページを効率よくクローリング

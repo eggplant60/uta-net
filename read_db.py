@@ -37,14 +37,14 @@ def split_batches(titles, artists, lyrics):
     new_lyrics = []
 
     for t, a, l in zip(titles, artists, lyrics):
-        split_lyrics = re.split('\n\n+', l) # パラグラフごとに分ける
-        for split_lyric in split_lyrics:
+        split_paragraphs = re.split('\n\n+', l) # パラグラフごとに分ける
+        for paragraph in split_paragraphs:
             # パラグラフの切れ目以外の改行は / で置き換えておく
-            split_lyric = split_lyric.replace('\n', '/')
-            if not is_english_all(split_lyric):
-                new_titles.append(t)    # 同じタイトル、アーティストで埋める
+            paragraph = paragraph.replace('\n', ' / ')
+            if not is_english_all(paragraph): # 英語の歌詞かどうか
+                new_titles.append(t)          # 同じタイトル、アーティストで埋める
                 new_artists.append(a)
-                new_lyrics.append(split_lyric)
+                new_lyrics.append(paragraph)
 
     return new_titles, new_artists, new_lyrics
 
@@ -87,7 +87,7 @@ def get_lyrics_dataset():
     new_lyrics = []
     for i, l in enumerate(lyrics):
         print('{}/{}'.format(i+1, len_lyrics))
-        new_lyrics.append(l)
+        new_lyrics.append(split_words(l))
 
     #print(titles, artists, lyrics)
     #print(split_words("Today aaa 運命なら"))
@@ -96,8 +96,25 @@ def get_lyrics_dataset():
     return titles, artists, new_lyrics
 
 
-if __name__ == '__main__':
-    _, _, lyrics = get_lyrics_dataset()
-    print(lyrics[10:15])
-    
 
+if __name__ == '__main__':
+    
+    titles, artists, lyrics = get_lyrics_dataset()
+    train_t, test_t, \
+    train_a, test_a, \
+    train_l, test_l = train_test_split(titles,
+                                       artists,
+                                       lyrics,
+                                       train_size=28000)
+
+    def write_list(list, filename):
+        with open(filename, 'w') as f:
+            f.write('\n'.join(list) + '\n')
+
+    write_list(train_t, 'train_t.txt')
+    write_list(test_t, 'test_t.txt')
+    write_list(train_a, 'train_a.txt')
+    write_list(test_a, 'test_a.txt')
+    write_list(train_l, 'train_l.txt')
+    write_list(test_l, 'test_l.txt')
+    
